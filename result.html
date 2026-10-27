@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>急寻厕所 · 附近的厕所</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="phone">
+
+  <!-- 顶部导视牌 -->
+  <header class="topbar">
+    <a class="topbar-btn" href="index.html" aria-label="返回首页"><span class="back-arrow">‹</span>返回</a>
+    <div class="topbar-title" style="text-align:center">
+      <h1 id="pageTitle" style="font-size:19px">附近的厕所</h1>
+      <p>500 米以内 · 由近到远</p>
+    </div>
+    <a class="topbar-btn" href="index.html">重新找</a>
+  </header>
+
+  <!-- ======== 正常结果视图 ======== -->
+  <div class="result-normal-wrap">
+
+    <!-- 地图点位标记（假地图，点位可点） -->
+    <div class="map-wrap fade-in">
+      <svg viewBox="0 0 430 240" role="img" aria-label="附近厕所地图">
+        <rect width="430" height="240" fill="#e9efe2"/>
+        <!-- 绿地 -->
+        <rect x="18" y="150" width="130" height="76" rx="12" fill="#d7e7c6"/>
+        <rect x="300" y="14" width="60" height="46" rx="10" fill="#d7e7c6"/>
+        <!-- 水面 -->
+        <ellipse cx="378" cy="196" rx="42" ry="26" fill="#cfe2ee"/>
+        <!-- 建筑 -->
+        <rect x="40" y="28" width="70" height="52" rx="6" fill="#e2ddd0"/>
+        <rect x="126" y="34" width="46" height="40" rx="6" fill="#e2ddd0"/>
+        <rect x="252" y="150" width="76" height="54" rx="6" fill="#e2ddd0"/>
+        <rect x="150" y="188" width="66" height="38" rx="6" fill="#e2ddd0"/>
+        <!-- 道路 -->
+        <path d="M-5 128 C 120 120, 300 140, 435 126" stroke="#ffffff" stroke-width="14" fill="none"/>
+        <path d="M215 -5 C 210 80, 222 170, 214 245" stroke="#ffffff" stroke-width="11" fill="none"/>
+        <path d="M-5 60 L 240 52" stroke="#ffffff" stroke-width="8" fill="none" opacity=".85"/>
+        <path d="M320 240 L 336 130" stroke="#ffffff" stroke-width="8" fill="none" opacity=".85"/>
+        <!-- 你在这里 -->
+        <g>
+          <circle cx="215" cy="132" r="20" fill="rgba(36,86,166,.18)">
+            <animate attributeName="r" values="16;24;16" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".5;.15;.5" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="215" cy="132" r="12" fill="#2456a6" stroke="#fff" stroke-width="3"/>
+          <circle cx="215" cy="132" r="3.4" fill="#fff"/>
+          <g transform="translate(178,152)">
+            <rect width="74" height="26" rx="13" fill="#2456a6"/>
+            <text x="37" y="18" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">你在这里</text>
+          </g>
+        </g>
+        <!-- 公厕点位（编号与下方列表一一对应，可点） -->
+        <a href="detail.html?id=1"><g class="pin">
+          <circle cx="172" cy="86" r="15" fill="#0b7a4b" stroke="#fff" stroke-width="3"/>
+          <text x="172" y="92" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">1</text>
+        </g></a>
+        <a href="detail.html?id=2"><g class="pin">
+          <circle cx="302" cy="103" r="15" fill="#0b7a4b" stroke="#fff" stroke-width="3"/>
+          <text x="302" y="109" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">2</text>
+        </g></a>
+        <a href="detail.html?id=3"><g class="pin">
+          <circle cx="120" cy="172" r="15" fill="#0b7a4b" stroke="#fff" stroke-width="3"/>
+          <text x="120" y="178" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">3</text>
+        </g></a>
+        <a href="detail.html?id=4"><g class="pin">
+          <circle cx="330" cy="52" r="15" fill="#0b7a4b" stroke="#fff" stroke-width="3"/>
+          <text x="330" y="58" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">4</text>
+        </g></a>
+        <a href="detail.html?id=5"><g class="pin">
+          <circle cx="82" cy="58" r="15" fill="#0b7a4b" stroke="#fff" stroke-width="3"/>
+          <text x="82" y="64" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">5</text>
+        </g></a>
+      </svg>
+    </div>
+
+    <div class="sort-hint fade-in-1"><span class="dot"></span>已经按由近到远排好啦，点一个去看留言</div>
+
+    <!-- 距离排序列表 -->
+    <div class="toilet-list" id="toiletList"></div>
+
+    <p class="list-foot fade-in-3">都不合适？<a class="link-like" href="index.html">回首页换个地方找</a></p>
+  </div>
+
+  <!-- ======== 无结果视图（演示边界） ======== -->
+  <div class="result-empty-wrap">
+    <div class="empty-view">
+      <div class="empty-icon">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/><path d="M8.2 11h5.6"/></svg>
+      </div>
+      <div class="empty-title">附近暂未查到公厕</div>
+      <p class="empty-sub">试试扩大搜索范围，再找一找</p>
+      <a class="btn-big" href="result.html" style="letter-spacing:.08em">扩大范围再找找</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- 原型演示工具条（评审用，非产品功能） -->
+<div class="demo-bar">
+  <b>原型演示：</b>
+  <a href="result.html">正常结果</a>
+  <a href="result.html?empty=1">演示：附近没厕所</a>
+  <span>地图上的数字点位也能点</span>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/common.js"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var place = params.get("place");
+  var empty = params.get("empty") === "1";
+
+  if (place) {
+    document.getElementById("pageTitle").textContent = "「" + place + "」附近的厕所";
+  }
+
+  if (empty) {
+    // 边界：检索无公厕结果
+    document.body.classList.add("is-empty");
+    document.querySelector(".map-wrap .pin") && document.querySelectorAll(".map-wrap a").forEach(function (a) { a.style.display = "none"; });
+    document.getElementById("pageTitle").textContent = "附近的厕所";
+  }
+
+  // 渲染由近到远排序列表（假数据）
+  var listEl = document.getElementById("toiletList");
+  TOILETS.forEach(function (t, i) {
+    var count = (COMMENTS[t.id] || []).length;
+    var a = document.createElement("a");
+    a.className = "toilet-item fade-in-" + ((i % 3) + 1);
+    a.href = "detail.html?id=" + t.id;
+    a.innerHTML =
+      '<div class="pin-badge">' + t.id + '</div>' +
+      '<div class="toilet-info">' +
+        '<div class="toilet-name">' + t.name + '</div>' +
+        '<div class="toilet-meta"><span class="tag">开放中</span> · ' + t.free +
+        ' · ' + (count > 0 ? count + " 条留言" : "暂无留言") + '</div>' +
+      '</div>' +
+      '<div class="toilet-dist">' +
+        '<div class="dist-num">' + t.distance + '<span class="dist-unit">米</span></div>' +
+        '<div class="dist-walk">走路约 ' + t.walk + ' 分钟</div>' +
+      '</div>';
+    listEl.appendChild(a);
+  });
+})();
+</script>
+</body>
+</html>

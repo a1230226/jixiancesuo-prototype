@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>急寻厕所 · 厕所详情</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="phone">
+
+  <!-- 顶部导视牌 -->
+  <header class="topbar">
+    <a class="topbar-btn" href="result.html" aria-label="返回列表"><span class="back-arrow">‹</span>返回</a>
+    <div class="topbar-title" style="text-align:center">
+      <h1 style="font-size:19px">厕所详情</h1>
+      <p>看留言 · 发留言 · 去导航</p>
+    </div>
+    <span style="flex:none;min-width:68px"></span>
+  </header>
+
+  <!-- 点位信息 -->
+  <div class="card info-card fade-in">
+    <div class="toilet-h" id="tName">—</div>
+    <p class="toilet-addr">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      <span id="tAddr">—</span>
+    </p>
+    <div class="chip-row" id="tChips"></div>
+  </div>
+
+  <!-- 一键步行导航 -->
+  <div class="nav-btn-wrap fade-in-1">
+    <button class="btn-big" id="btnNav">
+      <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3 3.6 10.3a.6.6 0 0 0 .06 1.13l6.6 2.06a.6.6 0 0 1 .4.4l2.05 6.6a.6.6 0 0 0 1.14.05z"/></svg>
+      步行去这里
+    </button>
+  </div>
+
+  <!-- 广告位预留：第一版完全不展示，后续迭代接入流量主广告 -->
+
+  <!-- 留言区 -->
+  <div class="comments-wrap fade-in-2">
+    <h2 class="section-title">大家的留言 <span id="cCount" style="font-size:16px;color:var(--muted);font-weight:700;margin-left:4px"></span></h2>
+    <p class="section-sub">都是匿名写的，放心说</p>
+
+    <div id="commentList"></div>
+
+    <!-- 无留言状态 -->
+    <div class="comments-empty" id="commentsEmpty">
+      <div class="big">暂无留言，你来第一条</div>
+      <div class="small">在下面写两句，告诉后来的人</div>
+    </div>
+
+    <!-- 发布留言 -->
+    <div class="card publish-card" id="publishCard">
+      <div class="publish-label">说说这个厕所的情况<span>只有文字，大家都看得到</span></div>
+      <textarea id="commentInput" maxlength="200" placeholder="比如：干净不干净、好不好找、要不要排队…"></textarea>
+      <div class="counter-row"><span id="charCount">0/200</span></div>
+      <button class="btn-big" id="btnPublish">发布留言</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- 原型演示工具条（评审用，非产品功能） -->
+<div class="demo-bar">
+  <b>原型演示：</b>
+  <a href="detail.html?id=1">正常留言</a>
+  <a href="detail.html?id=5">演示：暂无留言</a>
+  <button onclick="location.reload()">清空我的点赞</button>
+  <span>违规拦截：留言里写「加微信」再发布试试</span>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/common.js"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var id = parseInt(params.get("id"), 10) || 1;
+  var toilet = TOILETS.find(function (t) { return t.id === id; }) || TOILETS[0];
+  id = toilet.id;
+
+  // 点位信息
+  document.getElementById("tName").textContent = toilet.name;
+  document.getElementById("tAddr").textContent = toilet.addr;
+  document.getElementById("tChips").innerHTML =
+    '<span class="chip">开放中</span>' +
+    '<span class="chip">' + toilet.free + '</span>' +
+    '<span class="chip">走路约 ' + toilet.walk + ' 分钟</span>' +
+    '<span class="chip chip-orange">离你 ' + toilet.distance + ' 米</span>';
+
+  var listEl = document.getElementById("commentList");
+  var countEl = document.getElementById("cCount");
+  var inputEl = document.getElementById("commentInput");
+  var counterEl = document.getElementById("charCount");
+
+  function renderComments() {
+    var arr = COMMENTS[id] || [];
+    countEl.textContent = "(" + arr.length + "条)";
+    // 边界：点位无留言 → 大字提示 + 高亮发布框
+    document.body.classList.toggle("comments-empty-state", arr.length === 0);
+    document.getElementById("publishCard").classList.toggle("glow", arr.length === 0);
+    listEl.innerHTML = "";
+    arr.forEach(function (c, i) {
+      var card = document.createElement("div");
+      card.className = "card comment-card";
+      card.innerHTML =
+        '<div class="comment-text"></div>' +
+        '<div class="comment-foot">' +
+          '<span class="comment-time">' + c.time + '</span>' +
+          '<button class="like-btn" aria-label="点赞">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v11"/><path d="M7 11.2 10.8 3.8a2.2 2.2 0 0 1 4.1 1.5L14.2 9H19a2 2 0 0 1 2 2.4l-1.4 6.8A2 2 0 0 1 17.6 20H7Z"/></svg>' +
+            '<span class="like-count">' + c.likes + '</span>' +
+          '</button>' +
+        '</div>';
+      // 用 textContent 填正文，防转义问题
+      card.querySelector(".comment-text").textContent = c.text;
+      var btn = card.querySelector(".like-btn");
+      btn.onclick = function () {
+        if (btn.classList.contains("liked")) {
+          // 边界：同一用户对同一条留言仅允许点赞一次
+          toast("一个留言只能赞一次哦");
+          return;
+        }
+        c.likes += 1;
+        btn.querySelector(".like-count").textContent = c.likes;
+        btn.classList.add("liked", "pop");
+        toast("谢谢你告诉大家");
+      };
+      listEl.appendChild(card);
+    });
+  }
+  renderComments();
+
+  // 一键步行导航（原型：仅提示）
+  document.getElementById("btnNav").onclick = function () {
+    toast("原型演示：这里会打开手机地图，带你走过去", 2800);
+  };
+
+  // 发布留言
+  inputEl.addEventListener("input", function () {
+    counterEl.textContent = inputEl.value.length + "/200";
+  });
+  document.getElementById("btnPublish").onclick = function () {
+    var text = inputEl.value.trim();
+    if (!text) { toast("先写点什么吧"); return; }
+    var bad = checkViolation(text);
+    if (bad) {
+      // 边界：违规内容直接拦截，不提交
+      toast("留言里有「" + bad + "」这样的内容，发不出去，改一改再试试", 3000);
+      return;
+    }
+    (COMMENTS[id] = COMMENTS[id] || []).unshift({ text: text, time: "刚刚", likes: 0 });
+    inputEl.value = "";
+    counterEl.textContent = "0/200";
+    renderComments();
+    toast("发出去啦，谢谢你告诉大家");
+  };
+})();
+</script>
+</body>
+</html>

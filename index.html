@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>急寻厕所 · 首页</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="phone">
+
+  <!-- 顶部导视牌 -->
+  <header class="topbar">
+    <div class="logo-tile">厕</div>
+    <div class="topbar-title">
+      <h1>急寻厕所</h1>
+      <p>找厕所，点一下就行</p>
+    </div>
+  </header>
+
+  <!-- 首屏地图（未授权时为空白占位） -->
+  <div class="map-blank fade-in" aria-label="地图区域">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#8b8574" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+    <p>地图会出现在这里</p>
+  </div>
+
+  <!-- 简短易懂的提示 -->
+  <div class="tip-line fade-in-1">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9.5"/><path d="M12 8v.2M12 11.5V16"/></svg>
+    <span>想找附近的厕所？<br>点下面的绿色大按钮就行</span>
+  </div>
+
+  <!-- 大号主按钮 -->
+  <div class="main-actions fade-in-2">
+    <button class="btn-big" id="btnFind">
+      <svg class="btn-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      查看附近厕所
+    </button>
+
+    <div class="divider">或者</div>
+
+    <button class="btn-ghost" id="btnManual">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+      换个地方找厕所
+    </button>
+  </div>
+
+  <!-- 拒绝授权后出现的引导 -->
+  <div class="deny-hint" id="denyHint">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="flex:none;margin-top:2px"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="1.3" fill="currentColor" stroke="none"/><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18z"/></svg>
+    <span>点上面绿色的「换个地方找厕所」，选个商场、车站、公园的名字，一样能帮你找。</span>
+  </div>
+
+  <footer class="home-foot">
+    留言都是匿名的，不用注册<br>
+    <a class="link-like" href="javascript:void(0)" id="replayGuide">重看新手引导</a>
+  </footer>
+
+  <!-- ======== 新手引导（仅首次弹出，可关闭） ======== -->
+  <div class="overlay" id="guideOverlay">
+    <div class="sheet">
+      <button class="sheet-close" id="guideClose" aria-label="关闭">×</button>
+      <div class="sheet-title">第一次用？教你三步</div>
+      <div class="guide-steps">
+        <div class="guide-step">
+          <div class="guide-num">1</div>
+          <p>点绿色大按钮，<b>让我们知道你在哪</b></p>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">2</div>
+          <p>下面的厕所<b>越近排得越靠前</b></p>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">3</div>
+          <p>点一个厕所，<b>看留言、一键去导航</b></p>
+        </div>
+      </div>
+      <button class="btn-big" id="guideDone">开始用吧</button>
+    </div>
+  </div>
+
+  <!-- ======== 位置授权引导弹窗 ======== -->
+  <div class="overlay" id="authOverlay">
+    <div class="sheet">
+      <div class="sheet-title">需要知道你在哪</div>
+      <p class="sheet-text">打开位置，才能帮你找到附近的厕所。<br>放心，<b>不会把你的位置告诉别人</b>。</p>
+      <button class="btn-big" id="authOk">好，就这样办</button>
+      <button class="btn-ghost" id="authNo">先不用了</button>
+    </div>
+  </div>
+
+  <!-- ======== 手动选点弹窗 ======== -->
+  <div class="overlay" id="manualOverlay">
+    <div class="sheet" style="text-align:left">
+      <div class="sheet-title" style="text-align:center">换个地方找厕所</div>
+      <div class="manual-search">
+        <input id="manualInput" type="text" placeholder="输入商场、车站、公园的名字" maxlength="20">
+        <button id="manualSearch">找一找</button>
+      </div>
+      <p class="manual-cap">点一个常去的地方也行：</p>
+      <div class="manual-list" id="manualList"></div>
+    </div>
+  </div>
+
+  <!-- ======== 检索加载层 ======== -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">正在找附近的厕所…</div>
+  </div>
+
+</div>
+
+<!-- 原型演示工具条（评审用，非产品功能） -->
+<div class="demo-bar">
+  <b>原型演示：</b>
+  <button id="demoGuide">重看新手引导</button>
+  <span>拒绝授权演示：点「查看附近厕所」→「先不用了」</span>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/common.js"></script>
+<script>
+(function () {
+  var GUIDE_KEY = "jxwc_guide_seen";
+  var denied = false;
+
+  // 一次性新手引导：仅首次进入弹出
+  if (!localStorage.getItem(GUIDE_KEY)) showOverlay("#guideOverlay");
+  function closeGuide() {
+    hideOverlay("#guideOverlay");
+    localStorage.setItem(GUIDE_KEY, "1");
+  }
+  document.getElementById("guideDone").onclick = closeGuide;
+  document.getElementById("guideClose").onclick = closeGuide;
+  document.getElementById("replayGuide").onclick = function () {
+    localStorage.removeItem(GUIDE_KEY);
+    showOverlay("#guideOverlay");
+  };
+  document.getElementById("demoGuide").onclick = function () {
+    localStorage.removeItem(GUIDE_KEY);
+    showOverlay("#guideOverlay");
+  };
+
+  // 主按钮 → 授权引导（拒绝过后不再弹授权，引导手动选点）
+  document.getElementById("btnFind").onclick = function () {
+    if (denied) {
+      toast("位置权限被关掉了，点下面的「换个地方找厕所」一样能找");
+    } else {
+      showOverlay("#authOverlay");
+    }
+  };
+
+  // 同意 → 模拟授权成功，自动检索 500 米内公厕
+  document.getElementById("authOk").onclick = function () {
+    hideOverlay("#authOverlay");
+    goSearch("result.html", "正在找附近的厕所…");
+  };
+
+  // 拒绝 → 关闭自动检索，改走手动选点
+  document.getElementById("authNo").onclick = function () {
+    hideOverlay("#authOverlay");
+    denied = true;
+    document.getElementById("denyHint").classList.add("show");
+    var ghost = document.getElementById("btnManual");
+    ghost.classList.remove("pulse");
+    void ghost.offsetWidth;
+    ghost.classList.add("pulse");
+    toast("没关系！换个地方找也一样");
+  };
+
+  // 手动选点
+  document.getElementById("btnManual").onclick = function () { showOverlay("#manualOverlay"); };
+  var listEl = document.getElementById("manualList");
+  PLACES.forEach(function (p) {
+    var a = document.createElement("button");
+    a.className = "manual-item";
+    a.textContent = p;
+    a.onclick = function () { goPlace(p); };
+    listEl.appendChild(a);
+  });
+  document.getElementById("manualSearch").onclick = function () {
+    var v = document.getElementById("manualInput").value.trim();
+    if (!v) { toast("先填个地名哦"); return; }
+    goPlace(v);
+  };
+  document.getElementById("manualInput").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("manualSearch").click();
+  });
+  function goPlace(place) {
+    hideOverlay("#manualOverlay");
+    goSearch("result.html?place=" + encodeURIComponent(place), "正在找「" + place + "」附近的厕所…");
+  }
+})();
+</script>
+</body>
+</html>
